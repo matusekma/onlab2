@@ -35,3 +35,33 @@ def extract_qa_jura_forum(article):
 
     answer = article.find("div", itemprop="articleBody").get_text()
     return {"answer": clean_text(answer), "tags": tags, "question": clean_text(question)}
+
+
+def extract_qa_gutefrage(article):
+    question = article.find("h1", class_="Question-title").get_text().strip()
+    
+    question_text = ""
+    question_text_html = article.find("div", id="questiontext")
+    if question_text_html is not None:
+        question_text = question_text_html.get_text()
+
+    # remove block qoutes
+    for blockquote in article.findAll("blockquote"):
+        blockquote.decompose()
+
+    answer_cards_html = article.findAll("article", itemprop="suggestedAnswer")
+    answers = []
+    points = []
+    for answer_card_html in answer_cards_html:
+        answer_html = answer_card_html.find("div", class_="ContentBody")
+        answers.append(clean_text(answer_html.get_text()))
+
+        point_html = answer_card_html.find(
+            "meta", itemprop="upvoteCount")
+        if point_html is not None:
+            points.append(point_html["content"])
+        else:
+            points.append("unk")
+        
+
+    return {"answers": answers, "points": points, "question": clean_text(question), "question_text": clean_text(question_text)}
