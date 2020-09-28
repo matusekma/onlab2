@@ -39,7 +39,7 @@ def extract_qa_jura_forum(article):
 
 def extract_qa_gutefrage(article):
     question = article.find("h1", class_="Question-title").get_text().strip()
-    
+
     question_text = ""
     question_text_html = article.find("div", id="questiontext")
     if question_text_html is not None:
@@ -62,6 +62,19 @@ def extract_qa_gutefrage(article):
             points.append(point_html["content"])
         else:
             points.append("unk")
-        
 
     return {"answers": answers, "points": points, "question": clean_text(question), "question_text": clean_text(question_text)}
+
+
+def extract_qa_jusline(article):
+    question = article.find("h2", class_="topic-title").get_text().strip()
+    print(question)
+    posts = article.findAll("div", class_="content")
+    
+    question_text = posts[0].get_text()
+
+    answers = []
+    for answer in posts[1:]:
+        answers.append(clean_text(answer.get_text()))
+
+    return {"answers": answers, "question": clean_text(question), "question_text": clean_text(question_text)}
