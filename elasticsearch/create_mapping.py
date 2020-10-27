@@ -1,15 +1,6 @@
-from model.QA import QA
 from connect import connect
+from model.QA_jura_forum import QAJuraForum
 
 connect(hosts=['localhost'])
 
-QA.init()
-
-qa = QA(url="asd",
-        question="asd", 
-        question_text="Schön", 
-        answer="Apfel", 
-        tags=["Eins", "zwei"])
-
-print(qa.save(index="law_qa"))
-
+QAJuraForum.init()
