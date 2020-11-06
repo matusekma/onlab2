@@ -1,6 +1,9 @@
 import os
 
 from flask import Flask
+
+from flask import json
+from werkzeug.exceptions import HTTPException
 from api.search.search import search
 
 
@@ -12,7 +15,7 @@ def create_app(test_config=None):
 
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'api.sqlite'),
+        # DATABASE=os.path.join(app.instance_path, 'api.sqlite'),
     )
 
     if test_config is None:
@@ -27,5 +30,16 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
+
+    @app.errorhandler(HTTPException)
+    def handle_exception(e):
+        response = e.get_response()
+        response.data = json.dumps({
+            "code": e.code,
+            "name": e.name,
+            "description": e.description,
+        })
+        response.content_type = "application/json"
+        return response
 
     return app
