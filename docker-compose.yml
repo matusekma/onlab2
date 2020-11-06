@@ -27,6 +27,22 @@ services:
     depends_on: 
       - elasticsearch
 
+  search-api:
+    image: "${REGISTRY_URL:-search-api}/search-api:${IMAGE_TAG:-latest}"
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - searchengine-network
+    environment: 
+      - FLASK_APP=api
+      - FLASK_ENV=development
+    depends_on: 
+      - elasticsearch
+      - kibana
+
 volumes: # The volumes will store the database data; kept even after the containers are deleted
   elastic-data:
     driver: local
